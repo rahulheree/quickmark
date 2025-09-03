@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickMark - Link & Notes Saver</title>
+  
+  <!-- Tailwind CSS for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Use the Inter font family */
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #f8fafc; /* A fallback bg color */
+      background-image: linear-gradient(to bottom right, #f8fafc, #eef2ff);
+    }
+
+    /* Custom transition for a smoother feel */
+    .transition-all-smooth {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Fade-in animation for new items */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Style for the custom modal */
+    #deleteModal.hidden {
+        display: none;
+    }
+  </style>
+</head>
+<body class="h-full flex items-start justify-center py-8 px-4 md:py-16">
+
+  <main class="w-full max-w-2xl">
+    <!-- Header Section -->
+    <header class="text-center mb-10">
+      <div class="flex items-center justify-center gap-3 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256" class="text-teal-600"><path fill="currentColor" d="M224 48H32a8 8 0 0 0-8 8v136a8 8 0 0 0 8 8h192a8 8 0 0 0 8-8V56a8 8 0 0 0-8-8m-72 48a16 16 0 1 1-16-16a16 16 0 0 1 16 16m-88 16a16 16 0 1 1 16 16a16 16 0 0 1-16-16m144 32a16 16 0 1 1-16 16a16 16 0 0 1 16-16"/></svg>
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">QuickMark</h1>
+      </div>
+      <p class="text-slate-500">Your personal space to save links and notes.</p>
+    </header>
+
+    <!-- Search Bar Section -->
+    <div class="mb-6 relative">
+      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </div>
+      <input type="search" id="searchInput" placeholder="Search by title..." class="w-full bg-white/70 backdrop-blur-xl border border-slate-200 rounded-lg py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all-smooth">
+    </div>
+
+    <!-- Input Form Section (Collapsible) -->
+    <div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg mb-10 border border-slate-200 transition-all-smooth overflow-hidden">
+      <button id="formToggleButton" class="w-full flex justify-between items-center p-6 text-left focus:outline-none" aria-expanded="false" aria-controls="formContent">
+        <h2 class="text-lg font-semibold text-slate-700">Add a new link</h2>
+        <svg id="formToggleIcon" class="w-6 h-6 text-slate-500 transition-transform duration-300 transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+        </svg>
+      </button>
+      <div id="formContent" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+        <form id="addLinkForm" class="grid grid-cols-1 gap-4 px-6 pb-6">
+          <div>
+            <label for="title" class="text-sm font-medium text-slate-600">Title</label>
+            <input type="text" id="title" placeholder="e.g., Awesome Design Resources" required="" class="mt-1 block w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all-smooth">
+          </div>
+          <div>
+            <label for="url" class="text-sm font-medium text-slate-600">Link URL</label>
+            <input type="url" id="url" placeholder="https://..." required="" class="mt-1 block w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all-smooth">
+          </div>
+          <div>
+            <label for="note" class="text-sm font-medium text-slate-600">Note (Optional)</label>
+            <textarea id="note" rows="3" placeholder="A short note about this link..." class="mt-1 block w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all-smooth resize-none"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-teal-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all-smooth flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            Save Link
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Saved Links Section -->
+    <div id="linkContainer">
+      <!-- Links will be dynamically inserted here -->
+    </div>
+
+    <!-- Deletion Confirmation Modal -->
+    <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
+      <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm text-center transform transition-all" role="dialog" aria-modal="true">
+        <h3 class="text-lg font-semibold text-slate-800">Are you sure?</h3>
+        <p class="text-slate-500 mt-2 text-sm">Do you really want to delete this link? This action cannot be undone.</p>
+        <div id="modalLinkTitle" class="mt-4 p-3 bg-slate-100 rounded-lg text-slate-700 font-medium truncate text-left"></div>
+        <div class="mt-6 flex justify-end gap-3">
+          <button id="cancelDelete" class="px-5 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors font-semibold">Cancel</button>
+          <button id="confirmDelete" class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">Delete</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const linkForm = document.getElementById("addLinkForm");
+    const linkContainer = document.getElementById("linkContainer");
+    const titleInput = document.getElementById("title");
+    const urlInput = document.getElementById("url");
+    const noteInput = document.getElementById("note");
+    const searchInput = document.getElementById('searchInput');
+    const deleteModal = document.getElementById('deleteModal');
+    const modalLinkTitle = document.getElementById('modalLinkTitle');
+    const formToggleButton = document.getElementById('formToggleButton');
+    const formToggleIcon = document.getElementById('formToggleIcon');
+    const formContent = document.getElementById('formContent');
+    
+    let linkIndexToDelete = null;
+
+    // Load links from localStorage or initialize an empty array
+    let links = JSON.parse(localStorage.getItem("quickMarkLinks")) || [];
+
+    // --- RENDER FUNCTION ---
+    function renderLinks() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      
+      const filteredLinks = links
+        .map((link, index) => ({ ...link, originalIndex: index }))
+        .filter(link => link.title.toLowerCase().includes(searchTerm));
+
+      linkContainer.innerHTML = "";
+
+      if (links.length === 0) {
+        searchInput.classList.add('hidden'); // Hide search if no links exist
+        linkContainer.innerHTML = `
+          <div class="text-center bg-white/70 backdrop-blur-xl border border-slate-200 p-8 rounded-2xl shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 256 256" class="mx-auto text-slate-400"><path fill="currentColor" d="M152 112a16 16 0 1 1-16-16a16 16 0 0 1 16 16m-64-16a16 16 0 1 0 16 16a16 16 0 0 0-16-16m128 48a16 16 0 1 0 16 16a16 16 0 0 0-16-16m-64 0a16 16 0 1 0 16 16a16 16 0 0 0-16-16m-88-64a8 8 0 0 0 8 8h192a8 8 0 0 0 0-16H40a8 8 0 0 0-8 8m200 88H40a8 8 0 0 0 0 16h192a8 8 0 0 0 0-16"/></svg>
+            <h3 class="mt-4 text-xl font-semibold text-slate-700">No links yet!</h3>
+            <p class="mt-1 text-slate-500">Use the form above to add your first link.</p>
+          </div>`;
+        return;
+      }
+      
+      searchInput.classList.remove('hidden');
+
+      if (filteredLinks.length === 0) {
+        linkContainer.innerHTML = `
+        <div class="text-center bg-white/70 backdrop-blur-xl border border-slate-200 p-8 rounded-2xl shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-slate-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <h3 class="mt-4 text-xl font-semibold text-slate-700">No Results Found</h3>
+            <p class="mt-1 text-slate-500">No links match your search for "${searchInput.value}".</p>
+          </div>`;
+          return;
+      }
+      
+      const linkList = document.createElement('ul');
+      linkList.className = 'space-y-4';
+      filteredLinks.forEach(link => {
+        const listItem = document.createElement('li');
+        listItem.className = 'bg-white rounded-2xl shadow-lg transition-all-smooth hover:shadow-xl hover:-translate-y-1 border-l-4 border-transparent hover:border-teal-500 fade-in';
+        const noteHTML = link.note ? `<p class="text-slate-500 mt-2 text-sm break-words">${link.note}</p>` : '';
+        listItem.innerHTML = `
+          <div class="p-5">
+            <div class="flex justify-between items-start gap-4">
+              <div>
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="font-bold text-lg text-slate-800 hover:text-teal-600 transition-colors break-words">
+                  ${link.title}
+                </a>
+                <p class="text-sm text-slate-400 mt-1 break-all">${link.url}</p>
+              </div>
+              <div class="flex-shrink-0 relative">
+                <div class="flex items-center gap-2">
+                  <button onclick="copyLink(this, '${link.url}')" title="Copy Link" class="copy-btn p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-teal-600 transition-all-smooth">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  </button>
+                  <button onclick="deleteLink(${link.originalIndex})" title="Delete Link" class="p-2 rounded-full text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all-smooth">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            ${noteHTML}
+          </div>`;
+        linkList.appendChild(listItem);
+      });
+      linkContainer.appendChild(linkList);
+    }
+
+    // --- DATA MANAGEMENT & ACTIONS ---
+    function saveLinks() {
+      localStorage.setItem("quickMarkLinks", JSON.stringify(links));
+    }
+
+    function addLink(event) {
+      event.preventDefault();
+      const title = titleInput.value.trim();
+      const url = urlInput.value.trim();
+      const note = noteInput.value.trim();
+      if (title && url) {
+        links.unshift({ title, url, note }); 
+        saveLinks();
+        renderLinks();
+        linkForm.reset();
+        // Collapse the form after adding a link
+        if (formToggleButton.getAttribute('aria-expanded') === 'true') {
+            formToggleButton.click();
+        }
+      }
+    }
+
+    function deleteLink(index) {
+        linkIndexToDelete = index;
+        modalLinkTitle.textContent = links[index].title;
+        deleteModal.classList.remove('hidden');
+    }
+    
+    function copyLink(buttonElement, url) {
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            const originalIcon = buttonElement.innerHTML;
+            buttonElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            setTimeout(() => { buttonElement.innerHTML = originalIcon; }, 1500);
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+        }
+        document.body.removeChild(textarea);
+    }
+
+    // --- MODAL HANDLING ---
+    function hideModal() {
+        deleteModal.classList.add('hidden');
+        linkIndexToDelete = null;
+    }
+
+    document.getElementById('cancelDelete').addEventListener('click', hideModal);
+    document.getElementById('confirmDelete').addEventListener('click', () => {
+        if (linkIndexToDelete !== null) {
+            links.splice(linkIndexToDelete, 1);
+            saveLinks();
+            renderLinks();
+            hideModal();
+        }
+    });
+
+    // --- FORM TOGGLE ---
+    formToggleButton.addEventListener('click', () => {
+        const isExpanded = formToggleButton.getAttribute('aria-expanded') === 'true';
+        formToggleButton.setAttribute('aria-expanded', !isExpanded);
+        formToggleIcon.classList.toggle('rotate-45');
+
+        if (formContent.style.maxHeight) {
+            formContent.style.maxHeight = null;
+        } else {
+            // Set max-height to the scroll height to smoothly expand
+            formContent.style.maxHeight = formContent.scrollHeight + "px";
+        }
+    });
+
+    // --- INITIALIZATION ---
+    linkForm.addEventListener("submit", addLink);
+    searchInput.addEventListener('input', renderLinks);
+    renderLinks(); // Initial render on page load
+  </script>
+</body>
+</html>
