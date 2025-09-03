@@ -41,27 +41,49 @@
     #deleteModal.hidden {
         display: none;
     }
+    
+    /* Custom styles for clickable card */
+    .link-card {
+      cursor: pointer;
+      position: relative;
+    }
+    .link-card-content {
+      position: relative;
+      z-index: 1;
+    }
+    .link-card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+    }
   </style>
 </head>
 <body class="h-full flex items-start justify-center py-8 px-4 md:py-16">
 
   <main class="w-full max-w-2xl">
     <!-- Header Section -->
-    <header class="text-center mb-10">
-      <div class="flex items-center justify-center gap-3 mb-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256" class="text-teal-600"><path fill="currentColor" d="M224 48H32a8 8 0 0 0-8 8v136a8 8 0 0 0 8 8h192a8 8 0 0 0 8-8V56a8 8 0 0 0-8-8m-72 48a16 16 0 1 1-16-16a16 16 0 0 1 16 16m-88 16a16 16 0 1 1 16 16a16 16 0 0 1-16-16m144 32a16 16 0 1 1-16 16a16 16 0 0 1 16-16"/></svg>
-        <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">QuickMark</h1>
+    <header class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg p-5 sm:p-6 mb-8 border border-slate-200">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <!-- Title and Subtitle -->
+        <div class="text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start gap-3 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256" class="text-teal-600"><path fill="currentColor" d="M224 48H32a8 8 0 0 0-8 8v136a8 8 0 0 0 8 8h192a8 8 0 0 0 8-8V56a8 8 0 0 0-8-8m-72 48a16 16 0 1 1-16-16a16 16 0 0 1 16 16m-88 16a16 16 0 1 1 16 16a16 16 0 0 1-16-16m144 32a16 16 0 1 1-16 16a16 16 0 0 1 16-16"/></svg>
+              <h1 class="text-3xl font-bold text-slate-800 tracking-tight">QuickMark</h1>
+            </div>
+            <p class="mt-1 text-sm text-slate-500 sm:pl-11">Your personal space to save links and notes.</p>
+        </div>
+        <!-- Search Bar Section -->
+        <div class="w-full sm:w-64 relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+          <input type="search" id="searchInput" placeholder="Search..." class="w-full bg-white/80 border border-slate-200 rounded-lg py-2.5 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all-smooth">
+        </div>
       </div>
-      <p class="text-slate-500">Your personal space to save links and notes.</p>
     </header>
-
-    <!-- Search Bar Section -->
-    <div class="mb-6 relative">
-      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </div>
-      <input type="search" id="searchInput" placeholder="Search by title..." class="w-full bg-white/70 backdrop-blur-xl border border-slate-200 rounded-lg py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all-smooth">
-    </div>
 
     <!-- Input Form Section (Collapsible) -->
     <div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg mb-10 border border-slate-200 transition-all-smooth overflow-hidden">
@@ -142,7 +164,7 @@
       linkContainer.innerHTML = "";
 
       if (links.length === 0) {
-        searchInput.classList.add('hidden'); // Hide search if no links exist
+        searchInput.parentElement.classList.add('hidden'); // Hide search container if no links exist
         linkContainer.innerHTML = `
           <div class="text-center bg-white/70 backdrop-blur-xl border border-slate-200 p-8 rounded-2xl shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 256 256" class="mx-auto text-slate-400"><path fill="currentColor" d="M152 112a16 16 0 1 1-16-16a16 16 0 0 1 16 16m-64-16a16 16 0 1 0 16 16a16 16 0 0 0-16-16m128 48a16 16 0 1 0 16 16a16 16 0 0 0-16-16m-64 0a16 16 0 1 0 16 16a16 16 0 0 0-16-16m-88-64a8 8 0 0 0 8 8h192a8 8 0 0 0 0-16H40a8 8 0 0 0-8 8m200 88H40a8 8 0 0 0 0 16h192a8 8 0 0 0 0-16"/></svg>
@@ -152,7 +174,7 @@
         return;
       }
       
-      searchInput.classList.remove('hidden');
+      searchInput.parentElement.classList.remove('hidden');
 
       if (filteredLinks.length === 0) {
         linkContainer.innerHTML = `
@@ -168,15 +190,18 @@
       linkList.className = 'space-y-4';
       filteredLinks.forEach(link => {
         const listItem = document.createElement('li');
-        listItem.className = 'bg-white rounded-2xl shadow-lg transition-all-smooth hover:shadow-xl hover:-translate-y-1 border-l-4 border-transparent hover:border-teal-500 fade-in';
+        listItem.className = 'link-card bg-white rounded-2xl shadow-lg transition-all-smooth hover:shadow-xl hover:-translate-y-1 border-l-4 border-transparent hover:border-teal-500 fade-in';
+        
         const noteHTML = link.note ? `<p class="text-slate-500 mt-2 text-sm break-words">${link.note}</p>` : '';
+        
         listItem.innerHTML = `
-          <div class="p-5">
+          <div class="link-card-overlay" data-url="${link.url}" onclick="openLinkInNewTab('${link.url}')"></div>
+          <div class="link-card-content p-5">
             <div class="flex justify-between items-start gap-4">
               <div>
-                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="font-bold text-lg text-slate-800 hover:text-teal-600 transition-colors break-words">
+                <h3 class="font-bold text-lg text-slate-800 break-words cursor-pointer" onclick="openLinkInNewTab('${link.url}')">
                   ${link.title}
-                </a>
+                </h3>
                 <p class="text-sm text-slate-400 mt-1 break-all">${link.url}</p>
               </div>
               <div class="flex-shrink-0 relative">
@@ -197,6 +222,12 @@
       linkContainer.appendChild(linkList);
     }
 
+    // --- LINK OPENING FUNCTION ---
+    function openLinkInNewTab(url) {
+      // Open the link in a new tab
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
     // --- DATA MANAGEMENT & ACTIONS ---
     function saveLinks() {
       localStorage.setItem("quickMarkLinks", JSON.stringify(links));
@@ -205,8 +236,13 @@
     function addLink(event) {
       event.preventDefault();
       const title = titleInput.value.trim();
-      const url = urlInput.value.trim();
+      let url = urlInput.value.trim();
       const note = noteInput.value.trim();
+      
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
+      
       if (title && url) {
         links.unshift({ title, url, note }); 
         saveLinks();
